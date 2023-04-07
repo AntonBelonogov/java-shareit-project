@@ -3,17 +3,14 @@ package ru.practicum.shareit.request.repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.model.ItemDto;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.request.model.ItemRequestDto;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-public class ItemRequestRepository implements ItemRequestStorage{
+public class ItemRequestRepository implements ItemRequestStorage {
 
     private final JdbcTemplate jdbcTemplate;
 

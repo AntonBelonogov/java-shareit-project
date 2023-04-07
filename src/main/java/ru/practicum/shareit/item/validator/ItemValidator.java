@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.validator;
 import ru.practicum.shareit.item.model.Item;
 
 public class ItemValidator {
-    public static boolean ItemCheck(Item item) {
+    public static boolean itemCheck(Item item) {
         return item.getName() == null ||
                 item.getName().isBlank() ||
                 item.getName().isEmpty() ||
@@ -13,7 +13,7 @@ public class ItemValidator {
                 item.getDescription().isBlank();
     }
 
-    public static Item ItemPatch(Item fstItem, Item sndItem) {
+    public static Item itemPatch(Item fstItem, Item sndItem) {
 
         if (sndItem.getName() != null) {
             fstItem.setName(sndItem.getName());

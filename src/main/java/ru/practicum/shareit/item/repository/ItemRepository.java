@@ -69,7 +69,7 @@ public class ItemRepository implements ItemStorage {
             throw new ObjectNotFoundException("User don't have access to this item.");
         }
 
-        ItemValidator.ItemPatch(updatedItem, item);
+        ItemValidator.itemPatch(updatedItem, item);
 
         final String sqlQuery = "UPDATE item SET name = ?, description = ?, available = ? " +
                 "WHERE id = ? AND OWNER = ?";

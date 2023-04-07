@@ -39,7 +39,7 @@ public class ItemService {
         if (!userStorage.isUserExistsById(userId)) {
             throw new ObjectNotFoundException(USER_NOT_FOUND);
         }
-        if (ItemValidator.ItemCheck(item)) {
+        if (ItemValidator.itemCheck(item)) {
             throw new InvalidEntityException("Invalid item body.");
         }
         return itemStorage.addItem(userId, item);
