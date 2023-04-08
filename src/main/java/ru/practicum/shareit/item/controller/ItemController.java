@@ -10,6 +10,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/items")
 public class ItemController {
+
+    private static final String USERID_HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @Autowired
@@ -18,7 +20,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<Item> getItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<Item> getItems(@RequestHeader(USERID_HEADER) Long userId) {
         return itemService.getItems(userId);
     }
 
@@ -28,12 +30,12 @@ public class ItemController {
     }
 
     @PostMapping
-    public Item addItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody Item item) {
+    public Item addItem(@RequestHeader(USERID_HEADER) Long userId, @RequestBody Item item) {
         return itemService.addItem(userId, item);
     }
 
     @PatchMapping("/{itemId}")
-    public Item updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public Item updateItem(@RequestHeader(USERID_HEADER) Long userId,
                            @PathVariable Long itemId,
                            @RequestBody Item item) {
         return itemService.updateItem(userId, itemId, item);
