@@ -17,14 +17,14 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> handleUserAlreadyExists(final UserAlreadyExist e) {
-        return Map.of("409 USER ALREADY EXISTS", e.getMessage());
+    public Map<String, String> handleUserAlreadyExists(final EntityAlreadyExist e) {
+        return Map.of("409 ENTITY ALREADY EXISTS", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> handleItemAccessDeniedException(final ItemAccessDeniedException e) {
-        return Map.of("409 USER HAVEN'T ACCESS", e.getMessage());
+    public Map<String, String> handleItemAccessDeniedException(final EntityAccessDeniedException e) {
+        return Map.of("409 ENTITY HAVEN'T ACCESS", e.getMessage());
     }
 
     @ExceptionHandler

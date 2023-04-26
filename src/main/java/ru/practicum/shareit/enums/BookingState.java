@@ -1,14 +1,16 @@
 package ru.practicum.shareit.enums;
 
-public enum BookingStatus {
-    APPROVED("approved"),
+public enum BookingState {
+    ALL("all"),
+    CURRENT("current"),
+    PAST("past"),
+    FUTURE("future"),
     WAITING("waiting"),
-    REJECTED("rejected"),
-    CANCELED("canceled");
+    REJECTED("rejected");
 
     private String name;
 
-    BookingStatus(String name) {
+    BookingState(String name) {
         this.name = name;
     }
 
