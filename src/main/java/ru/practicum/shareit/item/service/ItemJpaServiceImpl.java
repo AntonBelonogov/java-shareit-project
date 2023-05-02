@@ -123,10 +123,10 @@ public class ItemJpaServiceImpl implements ItemService {
     public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
         validateComment(userId, itemId, commentDto);
         Comment comment = CommentMapper.toComment(commentDto);
-        User user = userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("User not found."));
-        Item item = repository.findById(itemId).orElseThrow(() -> new ObjectNotFoundException("Item not found."));
-        comment.setItem(item);
-        comment.setUser(user);
+        comment.setItem(repository.findById(itemId).orElseThrow(() ->
+                new ObjectNotFoundException("Item not found.")));
+        comment.setUser(userRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException("User not found.")));
         comment.setCreated(LocalDateTime.now());
         return CommentMapper.toCommentDto(commentRepository.save(comment));
     }
