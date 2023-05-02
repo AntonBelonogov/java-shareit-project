@@ -32,4 +32,10 @@ public class ErrorHandler {
     public Map<String, String> handleBadRequestException(final InvalidEntityException e) {
         return Map.of("400 BAD REQUEST", e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUnknownStateException(final UnknownBookingState e) {
+        return new ErrorResponse(e.getMessage());
+    }
 }

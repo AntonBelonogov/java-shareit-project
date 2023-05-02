@@ -13,6 +13,7 @@ import ru.practicum.shareit.enums.BookingState;
 import ru.practicum.shareit.enums.BookingStatus;
 import ru.practicum.shareit.exception.InvalidEntityException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
+import ru.practicum.shareit.exception.UnknownBookingState;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemJpaRepository;
 import ru.practicum.shareit.user.model.User;
@@ -76,9 +77,22 @@ public class BookingService {
                 .orElseThrow(() ->
                         new ObjectNotFoundException(BOOKING_ERROR));
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException(USER_ERROR));
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException(USER_ERROR));
 
-        booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
+        Item item = booking.getItem();
+
+        if (!item.getOwner().getId().equals(userId)) {
+            throw new ObjectNotFoundException("Unable to approve booking. User is not owner for this item.");
+        }
+
+        BookingStatus bookingStatus = approved ? BookingStatus.APPROVED : BookingStatus.REJECTED;
+
+        if (booking.getStatus() == bookingStatus) {
+            throw new InvalidEntityException("Status already " + bookingStatus.toString());
+        }
+
+        booking.setStatus(bookingStatus);
 
         return BookingMapper.toBookingInfoDto(repository.save(booking));
     }
@@ -92,11 +106,12 @@ public class BookingService {
             throw new ObjectNotFoundException("This user not item owner.");
         }
 
-
         return BookingMapper.toBookingInfoDto(booking);
     }
 
-    public List<BookingInfoDto> getBooking(Long userId, BookingState bookingState) {
+    public List<BookingInfoDto> getBooking(Long userId, String stateParam) {
+
+        BookingState bookingState = checkState(stateParam);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
         List<Booking> bookingList = new ArrayList<>();
@@ -130,7 +145,10 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
-    public List<BookingInfoDto> getOwnerBooking(Long userId, BookingState bookingState) {
+    public List<BookingInfoDto> getOwnerBooking(Long userId, String stateParam) {
+
+        BookingState bookingState = checkState(stateParam);
+
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
         List<Booking> bookingList = new ArrayList<>();
 
@@ -161,5 +179,13 @@ public class BookingService {
         return bookingList.isEmpty() ? Collections.emptyList() : bookingList.stream()
                 .map(BookingMapper::toBookingInfoDto)
                 .collect(Collectors.toList());
+    }
+
+    private BookingState checkState(String state) {
+        try {
+            return BookingState.valueOf(state.toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            throw new UnknownBookingState(String.format("Unknown state: %s", state));
+        }
     }
 }

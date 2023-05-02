@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.InvalidEntityException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.validator.ItemValidator;
@@ -26,18 +27,18 @@ public class ItemServiceImpl implements ItemService {
         this.userStorage = userStorage;
     }
 
-    public List<ItemDto> getItems(Long userId) {
+    public List<ItemInfoDto> getItems(Long userId) {
         return itemRepository.getItems(userId)
                 .stream()
-                .map(ItemMapper::toDto)
+                .map(ItemMapper::toItemInfo)
                 .collect(Collectors.toList());
     }
 
-    public ItemDto getItem(Long itemId) {
+    public ItemInfoDto getItem(Long itemId, Long userId) {
         if (!itemRepository.isItemExists(itemId)) {
             throw new ObjectNotFoundException(ITEM_NOT_FOUND);
         }
-        return ItemMapper.toDto(itemRepository.getItem(itemId));
+        return ItemMapper.toItemInfo(itemRepository.getItem(itemId));
     }
 
     public ItemDto addItem(Long userId, ItemDto item) {

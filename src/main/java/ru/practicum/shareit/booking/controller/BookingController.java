@@ -44,21 +44,13 @@ public class BookingController {
     @GetMapping
     public List<BookingInfoDto> getBooking(@RequestHeader(USERID_HEADER) Long userId,
                                        @RequestParam(name = "state", defaultValue = "all") String stateParam) {
-        BookingState bookingState = BookingState.valueOf(stateParam.toUpperCase());
-        if (bookingState == null) {
-            throw new InvalidEntityException("Unknown state: " + stateParam);
-        }
-        return bookingService.getBooking(userId, bookingState);
+        return bookingService.getBooking(userId, stateParam);
     }
 
     @GetMapping("/owner")
     public List<BookingInfoDto> getOwnerBooking(@RequestHeader(USERID_HEADER) Long userId,
                                        @RequestParam(name = "state", defaultValue = "all") String stateParam) {
-        BookingState bookingState = BookingState.valueOf(stateParam.toUpperCase());
-        if (bookingState == null) {
-            throw new InvalidEntityException("Unknown state: " + stateParam);
-        }
-        return bookingService.getOwnerBooking(userId, bookingState);
+        return bookingService.getOwnerBooking(userId, stateParam);
     }
 }
 
