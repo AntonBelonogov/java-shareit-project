@@ -5,8 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.enums.BookingState;
-import ru.practicum.shareit.exception.InvalidEntityException;
 
 import java.util.List;
 
@@ -29,8 +27,8 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     public BookingInfoDto updateBookingStatus(@RequestHeader(USERID_HEADER) Long userId,
-                                          @PathVariable Long bookingId,
-                                          @RequestParam(name = "approved") Boolean approved) {
+                                              @PathVariable Long bookingId,
+                                              @RequestParam(name = "approved") Boolean approved) {
 
         return bookingService.updateBookingStatus(userId, bookingId, approved);
     }
@@ -43,13 +41,13 @@ public class BookingController {
 
     @GetMapping
     public List<BookingInfoDto> getBooking(@RequestHeader(USERID_HEADER) Long userId,
-                                       @RequestParam(name = "state", defaultValue = "all") String stateParam) {
+                                           @RequestParam(name = "state", defaultValue = "all") String stateParam) {
         return bookingService.getBooking(userId, stateParam);
     }
 
     @GetMapping("/owner")
     public List<BookingInfoDto> getOwnerBooking(@RequestHeader(USERID_HEADER) Long userId,
-                                       @RequestParam(name = "state", defaultValue = "all") String stateParam) {
+                                                @RequestParam(name = "state", defaultValue = "all") String stateParam) {
         return bookingService.getOwnerBooking(userId, stateParam);
     }
 }

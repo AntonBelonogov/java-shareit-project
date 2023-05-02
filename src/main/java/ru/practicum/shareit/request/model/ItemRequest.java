@@ -11,7 +11,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Table(name = "request")
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
