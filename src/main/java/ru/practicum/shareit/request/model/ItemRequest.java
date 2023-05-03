@@ -26,5 +26,5 @@ public class ItemRequest {
     private User requestor;
 
     @Column
-    public LocalDate created;
+    private LocalDate created;
 }

@@ -95,7 +95,7 @@ public class ItemJpaServiceImpl implements ItemService {
             throw new ObjectNotFoundException("Item not belongs to this user.");
         }
 
-        updatedItem = itemUpdate(updatedItem, item);
+        updatedItem = (Item) itemUpdate(updatedItem, item);
         return ItemMapper.toDto(repository.save(updatedItem));
     }
 
@@ -151,7 +151,7 @@ public class ItemJpaServiceImpl implements ItemService {
         }
     }
 
-    private Item itemUpdate(Item updatedItem, ItemDto itemDto) {
+    private Object itemUpdate(Item updatedItem, ItemDto itemDto) {
         if (itemDto.getName() != null) {
             updatedItem.setName(itemDto.getName());
         }

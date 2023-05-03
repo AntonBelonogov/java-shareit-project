@@ -32,6 +32,6 @@ public class Comment {
     private User user;
 
     @Column
-    LocalDateTime created;
+    private LocalDateTime created;
 
 }

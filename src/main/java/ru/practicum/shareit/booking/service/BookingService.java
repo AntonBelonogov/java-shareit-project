@@ -31,6 +31,8 @@ public class BookingService {
     private static final String USER_ERROR = "User not found.";
     private static final String ITEM_ERROR = "Item not found.";
     private static final String BOOKING_ERROR = "Booking not found.";
+    private static final String BOOKING_STATE_ERROR = "Unknown booking state.";
+
     private final BookingRepository repository;
     private final UserJpaRepository userRepository;
     private final ItemJpaRepository itemRepository;
@@ -138,6 +140,8 @@ public class BookingService {
             case REJECTED:
                 bookingList = repository.findAllByBookerIdAndStatus(user.getId(), BookingStatus.REJECTED);
                 break;
+            default:
+                throw new UnknownBookingState(BOOKING_STATE_ERROR);
         }
 
         return bookingList.isEmpty() ? Collections.emptyList() : bookingList.stream()
@@ -174,6 +178,8 @@ public class BookingService {
             case REJECTED:
                 bookingList = repository.findAllByItem_Owner_IdAndStatus(user.getId(), BookingStatus.REJECTED);
                 break;
+            default:
+                throw new UnknownBookingState(BOOKING_STATE_ERROR);
         }
 
         return bookingList.isEmpty() ? Collections.emptyList() : bookingList.stream()
