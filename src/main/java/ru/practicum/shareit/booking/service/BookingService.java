@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -111,7 +112,7 @@ public class BookingService {
         return BookingMapper.toBookingInfoDto(booking);
     }
 
-    public List<BookingInfoDto> getBooking(Long userId, String stateParam) {
+    public List<BookingInfoDto> getBooking(Long userId, String stateParam, Integer from, Integer size) {
 
         BookingState bookingState = checkState(stateParam);
 
@@ -123,7 +124,7 @@ public class BookingService {
 
         switch (bookingState) {
             case ALL:
-                bookingList = repository.findAllByBookerIdOrderByStartDesc(user.getId());
+                bookingList = repository.findAllByBookerIdOrderByStartDesc(user.getId(), PageRequest.of((from / size), size));
                 break;
             case PAST:
                 bookingList = repository.findAllByBookerIdAndEndIsBefore(user.getId(), LocalDateTime.now(), sort);
@@ -149,7 +150,7 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
-    public List<BookingInfoDto> getOwnerBooking(Long userId, String stateParam) {
+    public List<BookingInfoDto> getOwnerBooking(Long userId, String stateParam, Integer from, Integer size) {
 
         BookingState bookingState = checkState(stateParam);
 
@@ -161,7 +162,7 @@ public class BookingService {
 
         switch (bookingState) {
             case ALL:
-                bookingList = repository.findAllByItem_Owner_IdOrderByStartDesc(user.getId());
+                bookingList = repository.findAllByItem_Owner_IdOrderByStartDesc(user.getId(), PageRequest.of((from / size), size));
                 break;
             case PAST:
                 bookingList = repository.findAllByItem_Owner_IdAndEndIsBefore(user.getId(), LocalDateTime.now(), sort);

@@ -19,6 +19,7 @@ import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemJpaRepository;
 import ru.practicum.shareit.item.validator.ItemValidator;
 import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.repository.UserJpaRepository;
 
 import javax.transaction.Transactional;
@@ -35,13 +36,19 @@ public class ItemJpaServiceImpl implements ItemService {
     private final UserJpaRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Autowired
-    public ItemJpaServiceImpl(ItemJpaRepository repository, UserJpaRepository userRepository, BookingRepository bookingRepository, CommentRepository commentRepository) {
+    public ItemJpaServiceImpl(ItemJpaRepository repository,
+                              UserJpaRepository userRepository,
+                              BookingRepository bookingRepository,
+                              CommentRepository commentRepository,
+                              ItemRequestRepository itemRequestRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.itemRequestRepository = itemRequestRepository;
     }
 
     @Override
@@ -82,6 +89,13 @@ public class ItemJpaServiceImpl implements ItemService {
         Item newItem = ItemMapper.toItem(item);
         newItem.setOwner(userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException("User not found.")));
+        if (item.getRequestId() == null) {
+            return ItemMapper.toDto(repository.save(newItem));
+        }
+        ItemRequest itemRequest = itemRequestRepository.findById(item.getRequestId())
+                .orElseThrow(() ->
+                        new ObjectNotFoundException("Request not found."));
+        newItem.setRequest(itemRequest);
         return ItemMapper.toDto(repository.save(newItem));
     }
 
@@ -165,8 +179,9 @@ public class ItemJpaServiceImpl implements ItemService {
             updatedItem.setOwner(userRepository.findById(itemDto.getOwner())
                     .orElseThrow(() -> new ObjectNotFoundException("User not found.")));
         }
-        if (itemDto.getRequest() != null) {
-            updatedItem.setRequest(new ItemRequest());
+        if (itemDto.getRequestId() != null) {
+            updatedItem.setRequest(itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new ObjectNotFoundException("Request not found.")));
         }
         return updatedItem;
     }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ItemJpaRepository extends JpaRepository<Item, Long> {
@@ -17,4 +18,6 @@ public interface ItemJpaRepository extends JpaRepository<Item, Long> {
     List<Item> search(@Param("text") String text);
 
     List<Item> findAllByOwnerId(Long ownerId);
+
+    List<Item> findAllByRequest_Id(Long requestId);
 }
