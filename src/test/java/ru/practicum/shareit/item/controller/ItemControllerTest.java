@@ -18,7 +18,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -133,7 +134,7 @@ class ItemControllerTest {
         updatedItem.setName("update");
         updatedItem.setDescription("update");
 
-        when(itemService.updateItem(anyLong(),anyLong(),any(ItemDto.class)))
+        when(itemService.updateItem(anyLong(), anyLong(), any(ItemDto.class)))
                 .thenReturn(updatedItem);
 
 
@@ -157,7 +158,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void searchItems() throws Exception{
+    void searchItems() throws Exception {
 
         ItemDto secondItem = ItemDto.builder()
                 .id(2L)
