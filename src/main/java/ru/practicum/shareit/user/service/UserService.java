@@ -1,56 +1,17 @@
 package ru.practicum.shareit.user.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ObjectNotFoundException;
-import ru.practicum.shareit.exception.UserAlreadyExist;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 
-@Service
-public class UserService {
-    private static final String OBJECT_NOT_FOUND = "User not found.";
-    private final UserRepository userRepository;
+public interface UserService {
+    List<UserDto> getUsers();
 
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    UserDto getUser(Long userId);
 
-    public List<User> getUsers() {
-        return userRepository.getUsers();
-    }
+    UserDto addUser(UserDto user);
 
-    public User getUser(Long userId) {
-        if (!userRepository.isUserExistsById(userId)) {
-            throw new ObjectNotFoundException(OBJECT_NOT_FOUND);
-        }
-        return userRepository.getUser(userId);
-    }
+    UserDto updateUser(Long userId, UserDto user);
 
-    public User addUser(User user) {
-        if (user.getEmail() == null) {
-            throw new IllegalArgumentException("Invalid user body.");
-        }
-        if (userRepository.isUserExistsByEmail(user.getEmail())) {
-            throw new UserAlreadyExist("User already exist.");
-        }
-        return userRepository.addUser(user);
-    }
-
-    public User updateUser(Long userId, User user) {
-        if (!userRepository.isUserExistsById(userId)) {
-            throw new ObjectNotFoundException(OBJECT_NOT_FOUND);
-        }
-        return userRepository.updateUser(userId, user);
-    }
-
-    public Boolean deleteUser(Long userId) {
-        if (!userRepository.isUserExistsById(userId)) {
-            throw new ObjectNotFoundException(OBJECT_NOT_FOUND);
-        }
-        return userRepository.deleteUser(userId);
-    }
+    void deleteUser(Long userId);
 }
