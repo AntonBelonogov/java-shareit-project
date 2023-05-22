@@ -80,7 +80,7 @@ public class BookingService {
                 .orElseThrow(() ->
                         new ObjectNotFoundException(BOOKING_ERROR));
 
-        User user = userRepository.findById(userId).orElseThrow(() ->
+        userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(USER_ERROR));
 
         Item item = booking.getItem();
@@ -92,7 +92,7 @@ public class BookingService {
         BookingStatus bookingStatus = approved ? BookingStatus.APPROVED : BookingStatus.REJECTED;
 
         if (booking.getStatus() == bookingStatus) {
-            throw new InvalidEntityException("Status already " + bookingStatus.toString());
+            throw new InvalidEntityException("Status already: " + bookingStatus);
         }
 
         booking.setStatus(bookingStatus);

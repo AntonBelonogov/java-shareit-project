@@ -88,7 +88,7 @@ public class ItemJpaServiceImpl implements ItemService {
         }
         Item newItem = ItemMapper.toItem(item);
         newItem.setOwner(userRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException("User not found.")));
+                new ObjectNotFoundException("Owner not found.")));
         if (item.getRequestId() == null) {
             return ItemMapper.toDto(repository.save(newItem));
         }
