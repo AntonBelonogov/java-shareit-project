@@ -65,7 +65,7 @@ public class BookingService {
                 .orElseThrow(() -> new ObjectNotFoundException(USER_ERROR));
 
         if (user.getId().equals(item.getOwner().getId())) {
-            throw new ObjectNotFoundException(USER_ERROR);
+            throw new ObjectNotFoundException("User have booking this item");
         }
         booking.setBooker(user);
         booking.setItem(item);
@@ -108,7 +108,6 @@ public class BookingService {
         if (!userId.equals(booking.getItem().getOwner().getId()) && !userId.equals(booking.getBooker().getId())) {
             throw new ObjectNotFoundException("This user not item owner.");
         }
-
         return BookingMapper.toBookingInfoDto(booking);
     }
 
@@ -141,8 +140,6 @@ public class BookingService {
             case REJECTED:
                 bookingList = repository.findAllByBookerIdAndStatus(user.getId(), BookingStatus.REJECTED);
                 break;
-            default:
-                throw new UnknownBookingState(BOOKING_STATE_ERROR);
         }
 
         return bookingList.isEmpty() ? Collections.emptyList() : bookingList.stream()
@@ -179,8 +176,6 @@ public class BookingService {
             case REJECTED:
                 bookingList = repository.findAllByItem_Owner_IdAndStatus(user.getId(), BookingStatus.REJECTED);
                 break;
-            default:
-                throw new UnknownBookingState(BOOKING_STATE_ERROR);
         }
 
         return bookingList.isEmpty() ? Collections.emptyList() : bookingList.stream()

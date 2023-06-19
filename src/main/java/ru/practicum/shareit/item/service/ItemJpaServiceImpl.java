@@ -64,18 +64,14 @@ public class ItemJpaServiceImpl implements ItemService {
     public ItemInfoDto getItem(Long itemId, Long userId) {
         Item item = repository.findById(itemId)
                 .orElseThrow(() -> new ObjectNotFoundException("Item not found."));
-
         ItemInfoDto itemInfoDto = ItemMapper.toItemInfo(item);
-
         if (item.getOwner().getId().equals(userId)) {
             setBookingToItem(itemInfoDto);
         }
-
         List<CommentDto> comments = commentRepository.findByItem_Id(itemId)
                 .stream()
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
-
         itemInfoDto.setComments(comments.isEmpty() ? Collections.emptyList() : comments);
 
         return itemInfoDto;
@@ -108,9 +104,7 @@ public class ItemJpaServiceImpl implements ItemService {
         if (!Objects.equals(updatedItem.getOwner().getId(), userId)) {
             throw new ObjectNotFoundException("Item not belongs to this user.");
         }
-
-        updatedItem = itemUpdate(updatedItem, item);
-        return ItemMapper.toDto(repository.save(updatedItem));
+        return ItemMapper.toDto(repository.save(itemUpdate(updatedItem, item)));
     }
 
     @Transactional

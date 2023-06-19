@@ -10,8 +10,10 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemJpaRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.mapper.RequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserJpaRepository;
 
 import java.time.LocalDateTime;
@@ -46,16 +48,17 @@ public class ItemRequestService {
     public ItemRequestDto addRequest(Long userId, ItemRequestDto itemRequestDto) {
         itemRequestDto.setRequestor(userId);
         itemRequestDto.setCreated(LocalDateTime.now());
-        ItemRequest itemRequest = this.toItemRequest(itemRequestDto);
+        User user = userJpaRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException(USER_NOT_FOUND));
+        ItemRequest itemRequest = RequestMapper.toItemRequest(itemRequestDto, user);
         return this.toItemRequestDto(itemRequestRepository.save(itemRequest));
     }
 
     public ItemRequestDto getRequestById(Long userId, Long requestId) {
         userJpaRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(USER_NOT_FOUND));
-        ItemRequestDto itemRequest = this.toItemRequestDto(itemRequestRepository.findById(requestId).orElseThrow(() ->
+        return this.toItemRequestDto(itemRequestRepository.findById(requestId).orElseThrow(() ->
                 new ObjectNotFoundException("Request not found.")));
-        return itemRequest;
     }
 
     public List<ItemRequestDto> getAllRequest(Long userId, Integer from, Integer size) {
@@ -64,12 +67,12 @@ public class ItemRequestService {
         }
         userJpaRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(USER_NOT_FOUND));
-        List<ItemRequestDto> requests = itemRequestRepository
+
+        return itemRequestRepository
                 .findAllByRequestorIdIsNot(userId, PageRequest.of((from / size), size, Sort.by("created").descending()))
                 .stream()
                 .map(this::toItemRequestDto)
                 .collect(Collectors.toList());
-        return requests;
     }
 
     private ItemRequestDto toItemRequestDto(ItemRequest itemRequest) {
@@ -83,27 +86,8 @@ public class ItemRequestService {
     }
 
     private List<ItemDto> putItemDtoToRequest(ItemRequest itemRequest) {
-        return itemRepository.findAllByRequest_Id(itemRequest.getId()).stream().map(this::toRequestItemDto).collect(Collectors.toList());
-    }
-
-    private ItemDto toRequestItemDto(Item item) {
-        return ItemDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .requestId(item.getRequest().getId())
-                .build();
-    }
-
-    private ItemRequest toItemRequest(ItemRequestDto itemRequestDto) {
-        return ItemRequest.builder()
-                .id(itemRequestDto.getId())
-                .description(itemRequestDto.getDescription())
-                .created(itemRequestDto.getCreated())
-                .requestor(userJpaRepository.findById(itemRequestDto.getRequestor())
-                        .orElseThrow(() ->
-                                new ObjectNotFoundException("User not found.")))
-                .build();
+        return itemRepository.findAllByRequest_Id(itemRequest.getId()).stream()
+                .map(RequestMapper::toRequestItemDto)
+                .collect(Collectors.toList());
     }
 }

@@ -2,8 +2,8 @@ package ru.practicum.shareit.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.EntityAlreadyExist;
+import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -76,7 +76,7 @@ public class UserJpaServiceImpl implements UserService {
             if (!repository.existsUserByEmail(user.getEmail())) {
                 updatedUser.setEmail(user.getEmail());
             } else {
-                throw new EntityAlreadyExist("Такой email уже существует.");
+                throw new EntityAlreadyExist("Email already exists.");
             }
         }
         return updatedUser;
