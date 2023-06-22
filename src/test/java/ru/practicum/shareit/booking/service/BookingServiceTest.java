@@ -113,6 +113,7 @@ class BookingServiceTest {
                                 .id(2L)
                                 .build())
                         .build()));
+
         assertThrows(InvalidEntityException.class, () -> {
             bookingService.addBooking(1L, bookingDto);
         });

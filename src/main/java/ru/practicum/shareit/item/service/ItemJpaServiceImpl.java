@@ -22,7 +22,6 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.repository.UserJpaRepository;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -95,7 +94,6 @@ public class ItemJpaServiceImpl implements ItemService {
         return ItemMapper.toDto(repository.save(newItem));
     }
 
-    @Transactional
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto item) {
         Item updatedItem = repository.findById(itemId)
@@ -104,10 +102,11 @@ public class ItemJpaServiceImpl implements ItemService {
         if (!Objects.equals(updatedItem.getOwner().getId(), userId)) {
             throw new ObjectNotFoundException("Item not belongs to this user.");
         }
-        return ItemMapper.toDto(repository.save(itemUpdate(updatedItem, item)));
+        Item savedItem = itemUpdate(updatedItem, item);
+        repository.save(savedItem);
+        return ItemMapper.toDto(savedItem);
     }
 
-    @Transactional
     @Override
     public void deleteItem(Long itemId) {
         if (!repository.existsById(itemId)) {

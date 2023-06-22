@@ -9,7 +9,6 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserJpaRepository;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +37,6 @@ public class UserJpaServiceImpl implements UserService {
                         new ObjectNotFoundException("User not found."));
     }
 
-    @Transactional
     @Override
     public UserDto addUser(UserDto user) {
         if (user.getEmail() == null) {
@@ -58,7 +56,6 @@ public class UserJpaServiceImpl implements UserService {
         return UserMapper.toUserDto(repository.save(userPatch(updateUser, user)));
     }
 
-    @Transactional
     @Override
     public void deleteUser(Long userId) {
         if (!repository.existsById(userId)) {

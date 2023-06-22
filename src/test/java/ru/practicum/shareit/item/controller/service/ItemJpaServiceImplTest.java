@@ -258,14 +258,17 @@ class ItemJpaServiceImplTest {
                 .build();
 
         when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
-
+        when(itemRequestRepository.findById(anyLong())).thenReturn(Optional.of(itemRequest));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        assertEquals(itemRequest.getId(), itemService.updateItem(1L, 1L, updatedItemDto).getRequestId());
 
         when(itemRepository.findById(1L)).thenReturn(Optional.empty());
+
         assertThrows(ObjectNotFoundException.class, () -> {
             itemService.updateItem(1L, 1L, itemDto);
         });
 
-        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+        when(itemRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(ObjectNotFoundException.class, () -> {
             itemDto.setOwner(1L);
             itemService.updateItem(1L, 1L, itemDto);
@@ -279,8 +282,14 @@ class ItemJpaServiceImplTest {
                 .request(itemRequest)
                 .available(true)
                 .build()));
+
         assertThrows(ObjectNotFoundException.class, () -> {
             itemService.updateItem(1L, 1L, itemDto);
+        });
+
+        when(itemRequestRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(ObjectNotFoundException.class, () -> {
+            itemService.updateItem(1L, 1L, updatedItemDto);
         });
     }
 }
