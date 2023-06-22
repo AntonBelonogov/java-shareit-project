@@ -203,13 +203,15 @@ class ItemJpaServiceImplTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         assertThrows(InvalidEntityException.class, () -> itemService.addComment(2L, 1L, commentDto));
 
-
         ItemInfoDto itemInfoDto = mock(ItemInfoDto.class);
         BookingItemDto bookingItemDto = BookingItemDto.builder().build();
         bookingItemDto.setId(1L);
+
         when(itemInfoDto.getLastBooking()).thenReturn(bookingItemDto);
         when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
-        assertThrows(InvalidEntityException.class, () -> itemService.addComment(1L, 2L, commentDto));
+
+        assertThrows(InvalidEntityException.class, () ->
+                itemService.addComment(1L, 2L, commentDto));
 
         when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
         when(commentRepository.save(any())).thenReturn(comment);
@@ -217,12 +219,10 @@ class ItemJpaServiceImplTest {
                 .thenReturn(List.of(booking));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(Item.builder()
                 .id(2L)
-                .owner(User.builder()
-                        .id(10L)
-                        .build())
+                .owner(User.builder().id(10L).build())
                 .build()));
-        CommentDto result = itemService.addComment(1L, 1L, commentDto);
-        assertNotNull(result);
+
+        assertNotNull(itemService.addComment(1L, 1L, commentDto));
 
         assertThrows(InvalidEntityException.class, () -> {
             commentDto.setText("");
@@ -257,6 +257,9 @@ class ItemJpaServiceImplTest {
                 .available(false)
                 .build();
 
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+
+
         when(itemRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(ObjectNotFoundException.class, () -> {
             itemService.updateItem(1L, 1L, itemDto);
@@ -265,6 +268,18 @@ class ItemJpaServiceImplTest {
         when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
         assertThrows(ObjectNotFoundException.class, () -> {
             itemDto.setOwner(1L);
+            itemService.updateItem(1L, 1L, itemDto);
+        });
+
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(Item.builder()
+                .id(1L)
+                .name("item1")
+                .description("item1")
+                .owner(User.builder().id(1000L).build())
+                .request(itemRequest)
+                .available(true)
+                .build()));
+        assertThrows(ObjectNotFoundException.class, () -> {
             itemService.updateItem(1L, 1L, itemDto);
         });
     }
