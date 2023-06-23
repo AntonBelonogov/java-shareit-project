@@ -29,15 +29,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ItemControllerTest {
 
     @Autowired
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    ItemJpaServiceImpl itemService;
+    private ItemJpaServiceImpl itemService;
 
-    ItemDto itemDto;
-    ItemInfoDto itemInfoDto;
-    CommentDto commentDto;
+    private ItemDto itemDto;
+    private ItemInfoDto itemInfoDto;
+    private CommentDto commentDto;
 
 
     @BeforeEach

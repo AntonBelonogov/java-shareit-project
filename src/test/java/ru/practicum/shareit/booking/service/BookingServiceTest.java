@@ -38,16 +38,16 @@ import static org.mockito.Mockito.when;
 class BookingServiceTest {
 
     @InjectMocks
-    BookingService bookingService;
+    private BookingService bookingService;
 
     @Mock
-    BookingRepository bookingRepository;
+    private BookingRepository bookingRepository;
 
     @Mock
-    UserJpaRepository userRepository;
+    private UserJpaRepository userRepository;
 
     @Mock
-    ItemJpaRepository itemRepository;
+    private ItemJpaRepository itemRepository;
 
     private Booking booking;
     private Item item;
