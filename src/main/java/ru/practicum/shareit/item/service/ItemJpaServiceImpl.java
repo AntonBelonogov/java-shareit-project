@@ -19,9 +19,9 @@ import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemJpaRepository;
 import ru.practicum.shareit.item.validator.ItemValidator;
 import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.repository.UserJpaRepository;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -35,13 +35,19 @@ public class ItemJpaServiceImpl implements ItemService {
     private final UserJpaRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Autowired
-    public ItemJpaServiceImpl(ItemJpaRepository repository, UserJpaRepository userRepository, BookingRepository bookingRepository, CommentRepository commentRepository) {
+    public ItemJpaServiceImpl(ItemJpaRepository repository,
+                              UserJpaRepository userRepository,
+                              BookingRepository bookingRepository,
+                              CommentRepository commentRepository,
+                              ItemRequestRepository itemRequestRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.itemRequestRepository = itemRequestRepository;
     }
 
     @Override
@@ -57,18 +63,14 @@ public class ItemJpaServiceImpl implements ItemService {
     public ItemInfoDto getItem(Long itemId, Long userId) {
         Item item = repository.findById(itemId)
                 .orElseThrow(() -> new ObjectNotFoundException("Item not found."));
-
         ItemInfoDto itemInfoDto = ItemMapper.toItemInfo(item);
-
         if (item.getOwner().getId().equals(userId)) {
             setBookingToItem(itemInfoDto);
         }
-
         List<CommentDto> comments = commentRepository.findByItem_Id(itemId)
                 .stream()
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
-
         itemInfoDto.setComments(comments.isEmpty() ? Collections.emptyList() : comments);
 
         return itemInfoDto;
@@ -81,11 +83,17 @@ public class ItemJpaServiceImpl implements ItemService {
         }
         Item newItem = ItemMapper.toItem(item);
         newItem.setOwner(userRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException("User not found.")));
+                new ObjectNotFoundException("Owner not found.")));
+        if (item.getRequestId() == null) {
+            return ItemMapper.toDto(repository.save(newItem));
+        }
+        ItemRequest itemRequest = itemRequestRepository.findById(item.getRequestId())
+                .orElseThrow(() ->
+                        new ObjectNotFoundException("Request not found."));
+        newItem.setRequest(itemRequest);
         return ItemMapper.toDto(repository.save(newItem));
     }
 
-    @Transactional
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto item) {
         Item updatedItem = repository.findById(itemId)
@@ -94,12 +102,11 @@ public class ItemJpaServiceImpl implements ItemService {
         if (!Objects.equals(updatedItem.getOwner().getId(), userId)) {
             throw new ObjectNotFoundException("Item not belongs to this user.");
         }
-
-        updatedItem = itemUpdate(updatedItem, item);
-        return ItemMapper.toDto(repository.save(updatedItem));
+        Item savedItem = itemUpdate(updatedItem, item);
+        repository.save(savedItem);
+        return ItemMapper.toDto(savedItem);
     }
 
-    @Transactional
     @Override
     public void deleteItem(Long itemId) {
         if (!repository.existsById(itemId)) {
@@ -165,8 +172,9 @@ public class ItemJpaServiceImpl implements ItemService {
             updatedItem.setOwner(userRepository.findById(itemDto.getOwner())
                     .orElseThrow(() -> new ObjectNotFoundException("User not found.")));
         }
-        if (itemDto.getRequest() != null) {
-            updatedItem.setRequest(new ItemRequest());
+        if (itemDto.getRequestId() != null) {
+            updatedItem.setRequest(itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new ObjectNotFoundException("Request not found.")));
         }
         return updatedItem;
     }

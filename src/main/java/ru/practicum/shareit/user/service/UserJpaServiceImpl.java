@@ -2,14 +2,13 @@ package ru.practicum.shareit.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.EntityAlreadyExist;
+import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserJpaRepository;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +37,6 @@ public class UserJpaServiceImpl implements UserService {
                         new ObjectNotFoundException("User not found."));
     }
 
-    @Transactional
     @Override
     public UserDto addUser(UserDto user) {
         if (user.getEmail() == null) {
@@ -58,7 +56,6 @@ public class UserJpaServiceImpl implements UserService {
         return UserMapper.toUserDto(repository.save(userPatch(updateUser, user)));
     }
 
-    @Transactional
     @Override
     public void deleteUser(Long userId) {
         if (!repository.existsById(userId)) {
@@ -76,7 +73,7 @@ public class UserJpaServiceImpl implements UserService {
             if (!repository.existsUserByEmail(user.getEmail())) {
                 updatedUser.setEmail(user.getEmail());
             } else {
-                throw new EntityAlreadyExist("Такой email уже существует.");
+                throw new EntityAlreadyExist("Email already exists.");
             }
         }
         return updatedUser;

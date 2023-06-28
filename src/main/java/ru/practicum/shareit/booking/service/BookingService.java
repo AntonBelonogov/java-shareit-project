@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -64,7 +65,7 @@ public class BookingService {
                 .orElseThrow(() -> new ObjectNotFoundException(USER_ERROR));
 
         if (user.getId().equals(item.getOwner().getId())) {
-            throw new ObjectNotFoundException(USER_ERROR);
+            throw new ObjectNotFoundException("User have booking this item");
         }
         booking.setBooker(user);
         booking.setItem(item);
@@ -79,7 +80,7 @@ public class BookingService {
                 .orElseThrow(() ->
                         new ObjectNotFoundException(BOOKING_ERROR));
 
-        User user = userRepository.findById(userId).orElseThrow(() ->
+        userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(USER_ERROR));
 
         Item item = booking.getItem();
@@ -91,7 +92,7 @@ public class BookingService {
         BookingStatus bookingStatus = approved ? BookingStatus.APPROVED : BookingStatus.REJECTED;
 
         if (booking.getStatus() == bookingStatus) {
-            throw new InvalidEntityException("Status already " + bookingStatus.toString());
+            throw new InvalidEntityException("Status already: " + bookingStatus);
         }
 
         booking.setStatus(bookingStatus);
@@ -107,11 +108,10 @@ public class BookingService {
         if (!userId.equals(booking.getItem().getOwner().getId()) && !userId.equals(booking.getBooker().getId())) {
             throw new ObjectNotFoundException("This user not item owner.");
         }
-
         return BookingMapper.toBookingInfoDto(booking);
     }
 
-    public List<BookingInfoDto> getBooking(Long userId, String stateParam) {
+    public List<BookingInfoDto> getBooking(Long userId, String stateParam, Integer from, Integer size) {
 
         BookingState bookingState = checkState(stateParam);
 
@@ -123,7 +123,7 @@ public class BookingService {
 
         switch (bookingState) {
             case ALL:
-                bookingList = repository.findAllByBookerIdOrderByStartDesc(user.getId());
+                bookingList = repository.findAllByBookerIdOrderByStartDesc(user.getId(), PageRequest.of((from / size), size));
                 break;
             case PAST:
                 bookingList = repository.findAllByBookerIdAndEndIsBefore(user.getId(), LocalDateTime.now(), sort);
@@ -140,8 +140,6 @@ public class BookingService {
             case REJECTED:
                 bookingList = repository.findAllByBookerIdAndStatus(user.getId(), BookingStatus.REJECTED);
                 break;
-            default:
-                throw new UnknownBookingState(BOOKING_STATE_ERROR);
         }
 
         return bookingList.isEmpty() ? Collections.emptyList() : bookingList.stream()
@@ -149,7 +147,7 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
-    public List<BookingInfoDto> getOwnerBooking(Long userId, String stateParam) {
+    public List<BookingInfoDto> getOwnerBooking(Long userId, String stateParam, Integer from, Integer size) {
 
         BookingState bookingState = checkState(stateParam);
 
@@ -161,7 +159,7 @@ public class BookingService {
 
         switch (bookingState) {
             case ALL:
-                bookingList = repository.findAllByItem_Owner_IdOrderByStartDesc(user.getId());
+                bookingList = repository.findAllByItem_Owner_IdOrderByStartDesc(user.getId(), PageRequest.of((from / size), size));
                 break;
             case PAST:
                 bookingList = repository.findAllByItem_Owner_IdAndEndIsBefore(user.getId(), LocalDateTime.now(), sort);
@@ -178,8 +176,6 @@ public class BookingService {
             case REJECTED:
                 bookingList = repository.findAllByItem_Owner_IdAndStatus(user.getId(), BookingStatus.REJECTED);
                 break;
-            default:
-                throw new UnknownBookingState(BOOKING_STATE_ERROR);
         }
 
         return bookingList.isEmpty() ? Collections.emptyList() : bookingList.stream()
